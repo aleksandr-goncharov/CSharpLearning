@@ -1,7 +1,7 @@
 ﻿// Сортировка выбором (сложность: O(n^2))
 using System.Diagnostics;
 
-var arraysLength = 60000;
+var arraysLength = 5000;
 
 var array = Enumerable.Range(0, arraysLength).ToArray();
 
@@ -10,6 +10,12 @@ var watch = Stopwatch.StartNew();
 InsertionSort(clonedArray);
 watch.Stop();
 Console.WriteLine($"Сортировка выбором: { watch.Elapsed.TotalMilliseconds } мс.");
+
+clonedArray = (int[])array.Clone();
+watch = Stopwatch.StartNew();
+QuickSort(clonedArray);
+watch.Stop();
+Console.WriteLine($"Быстрая сортировка: {watch.Elapsed.TotalMilliseconds} мс.");
 
 clonedArray = (int[])array.Clone();
 watch = Stopwatch.StartNew();
@@ -35,3 +41,26 @@ static void InsertionSort(int[] values)
     }
 }
 
+static int[] QuickSort(int[] values)
+{
+    if (values.Length < 2)
+    {
+        return values;
+    }
+
+    var pivot = values[0];
+
+    var valuesGreaterThanPivot = values[1..].Where(value => value > pivot).ToArray();
+
+    QuickSort(valuesGreaterThanPivot);
+
+    var valuesLessThanPivot = values[1..].Where(value => value <= pivot).ToArray();
+
+    QuickSort(valuesLessThanPivot);
+
+    Array.Copy(valuesGreaterThanPivot, 0, values, 0, valuesGreaterThanPivot.Length);
+    Array.Copy(new int[] { pivot }, 0, values, valuesGreaterThanPivot.Length, 1);
+    Array.Copy(valuesLessThanPivot, 0, values, valuesGreaterThanPivot.Length + 1, valuesLessThanPivot.Length);
+
+    return values;
+}
