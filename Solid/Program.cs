@@ -14,7 +14,7 @@ public class BadRegisterService
         {
             throw new InvalidOperationException();
         }
-        
+
         var connection = new SqlConnection();
         connection.Open();
         // Вставить в БД запись о пользователе
@@ -37,5 +37,87 @@ public class GoodRegisterService
         //_userRepository.Insert(...);
 
         //_emailService.Send(...);
+    }
+}
+
+// OCP - Open-closed principle (принцип открытости-закрытости)
+// Программные сущности должны быть открыты для расширения, но закрыты для модификации.
+
+public class BadRectangle
+{
+    public double Width { get; set; }
+
+    public double Height { get; set; }
+}
+
+public class BadCircle
+{
+    public double Radius { get; set; }
+}
+
+public class BadAreaCalculator
+{
+    // OCP не соблюдается: данный метод закрыт для расширения, так как может обрабатывать
+    // только классы Rectangle и Circle, а также открыт для модификации, так как если потребуется добавить поддержку Triangle,
+    // то придется модифицировать этот метод.
+    public double Area(object[] shapes)
+    {
+        double area = 0;
+
+        foreach (var shape in shapes)
+        {
+            if (shape is BadRectangle)
+            {
+                var rectangle = (BadRectangle)shape;
+
+                area += rectangle.Width * rectangle.Height;
+            }
+            else
+            {
+                var circle = (BadCircle)shape;
+
+                area += circle.Radius * circle.Radius * Math.PI;
+            }
+        }
+
+        return area;
+    }
+}
+
+public abstract class Shape
+{
+    public abstract double Area();
+}
+
+public class GoodRectangle : Shape
+{
+    public double Width { get; set; }
+
+    public double Height { get; set; }
+
+    public override double Area() => Width * Height;
+}
+
+public class GoodCircle : Shape
+{
+    public double Radius { get; set; }
+
+    public override double Area() => Radius * Radius * Math.PI;
+}
+
+public class GoodAreaCalculator
+{
+    // OCP соблюдается: теперь каждый подтип класса Shape обрабатывает рассчет площади, используя полиморфизм,
+    // что открывает метод Area для расширения и избавляет от необходимости его модификации.
+    public double Area(Shape[] shapes)
+    {
+        double area = 0;
+
+        foreach (var shape in shapes)
+        {
+            area += shape.Area();
+        }
+
+        return area;
     }
 }
