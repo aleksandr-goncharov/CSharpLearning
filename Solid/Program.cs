@@ -1,6 +1,7 @@
 ﻿using System.Data.SqlClient;
 using System.Net.Mail;
 
+Console.ReadKey();
 
 // SRP - Single-responsibility principle (принцип единственной ответственности)
 // Для каждого класса должно быть определено единственное назначение.
@@ -25,6 +26,8 @@ public class BadRegisterService
         client.Send(new MailMessage());
     }
 }
+
+// -------------------------
 
 public class GoodRegisterService
 {
@@ -83,6 +86,8 @@ public class BadAreaCalculator
         return area;
     }
 }
+
+// -------------------------
 
 public abstract class Shape
 {
@@ -153,6 +158,8 @@ class BadFruitProgram
     // заменяться экземплярами их подтипов без изменения правильности работы этой программы.
     public void WriteAppleColorToConsole(BadApple apple) => Console.Write(apple.GetAvailableColor());
 }
+
+// -------------------------
 
 public abstract class Fruit
 {
