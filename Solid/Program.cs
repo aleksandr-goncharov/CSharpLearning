@@ -1,10 +1,10 @@
 ﻿using System.Data.SqlClient;
 using System.Net.Mail;
 
+
 // SRP - Single-responsibility principle (принцип единственной ответственности)
 // Для каждого класса должно быть определено единственное назначение.
 // Все ресурсы, необходимые для его осуществления, должны быть инкапсулированы в этот класс и подчинены только этой задаче.
-
 public class BadRegisterService
 {
     // SRP не соблюдается: данный метод и регистрирует пользователя, и добавляет его в БД, и отправляет эл. письмо
@@ -120,4 +120,58 @@ public class GoodAreaCalculator
 
         return area;
     }
+}
+
+// LSP - Liskov substitution priciple (принцип подстановки Лисков)
+// Объекты в программе могут заменяться экземплярами их подтипов без изменения правильности работы этой программы. Другая формулировка:
+// функции, которые используют базовый тип, должны иметь возможность использовать подтипы базового типа не зная об этом.
+
+[Flags]
+public enum Color
+{
+    Red = 1,
+    Green = 2,
+    Yellow = 4,
+    Orange = 16,
+}
+
+public class BadApple
+{
+    public virtual Color GetAvailableColor() => Color.Red | Color.Green | Color.Yellow;
+}
+
+public class BadOrange : BadApple
+{
+    public override Color GetAvailableColor() => Color.Orange;
+}
+
+class BadFruitProgram
+{
+    // LSP не соблюдается: если в метод WriteAppleColorToConsole в качестве параметра передать объект класса BadApple, то
+    // на консоль выведется строка "Red, Green, Yellow". Если в этот же метод в качестве параметра передать объект
+    // класса BadOrange (дочерний по отношению к BadApple), то на консоль выведется стркоа "Orange". Таким образом, объекты в программе НЕ могут
+    // заменяться экземплярами их подтипов без изменения правильности работы этой программы.
+    public void WriteAppleColorToConsole(BadApple apple) => Console.Write(apple.GetAvailableColor());
+}
+
+public abstract class Fruit
+{
+    public abstract Color GetAvailableColor();
+}
+
+public class GoodApple : Fruit
+{
+    public override Color GetAvailableColor() => Color.Red | Color.Green | Color.Yellow;
+}
+
+public class GoodOrange : Fruit
+{
+    public override Color GetAvailableColor() => Color.Orange;
+}
+
+class GoodFruitProgram
+{
+    // LSP соблюдается: в метод WriteAppleColorToConsole в качестве параметра можно передать объект любого дочернего класса Fruit и на консоль
+    // будет выведена корректная строка.
+    public void WriteAppleColorToConsole(Fruit fruit) => Console.Write(fruit.GetAvailableColor());
 }
