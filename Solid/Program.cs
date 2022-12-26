@@ -182,3 +182,65 @@ class GoodFruitProgram
     // будет выведена корректная строка.
     public void WriteAppleColorToConsole(Fruit fruit) => Console.Write(fruit.GetAvailableColor());
 }
+
+// ISP - Interface segregation principle (принцип разделения интефейса)
+// Много интерфейсов, специально предназначенных для клиентов, лучше, чем один интерфейс общего назначения. Принцип разделения интерфейсов
+// говорит о том, что слишком «толстые» интерфейсы необходимо разделять на более маленькие и специфические,
+// чтобы программные сущности маленьких интерфейсов знали только о методах, которые необходимы им в работе.
+// В итоге, при изменении метода интерфейса не должны меняться программные сущности, которые этот метод не используют.
+
+public abstract class WorkerBad
+{
+    public string ID { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public float MonthlySalary { get; set; }
+    public float OtherBenefits { get; set; }
+    public float HourlyRate { get; set; }
+    public float HoursInMonth { get; set; }
+    public abstract float CalculateNetSalary();
+    public abstract float CalculateWorkedSalary();
+}
+
+// Эта программа не следует ISP, потому что классу FullTimeEmployee не нужна функция CalculateWorkedSalary(), а
+// классу ContractEmployeeclass не нужна функция CalculateNetSalary(). Ни один из этих методов не способствует достижению цели
+// этих классов. Вместо этого они реализованы потому, что являются производными классами абстрактного класса WorkerBad.
+
+public class FullTimeEmployeeBad : WorkerBad
+{
+    public override float CalculateNetSalary() => MonthlySalary + OtherBenefits;
+    public override float CalculateWorkedSalary() => throw new NotImplementedException();
+}
+
+public class ContractEmployeeBad : WorkerBad
+{
+    public override float CalculateNetSalary() => throw new NotImplementedException();
+    public override float CalculateWorkedSalary() => HourlyRate * HoursInMonth;
+}
+
+// -------------------------
+
+public abstract class WorkerGood
+{
+    public string ID { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string Email { get; set; } = null!;
+}
+
+// Абстрактный класс WorkerBad разделен на базовый абстрактный класс WorkerGood и два дочерних класса FullTimeEmployeeGood и ContractEmployeeGood.
+// Общий абстрактный класс содержит методы, которые являются общими для всех работников.
+// Дочерние классы разделяют методы по типам работников: FullTime с зарплатой или Contract, получающий почасовую оплату.
+
+public class FullTimeEmployeeGood : WorkerGood
+{
+    public float MonthlySalary { get; set; }
+    public float OtherBenefits { get; set; }
+    public float CalculateNetSalary() => MonthlySalary + OtherBenefits;
+}
+
+public class ContractEmployeeGood : WorkerGood
+{
+    public float HourlyRate { get; set; }
+    public float HoursInMonth { get; set; }
+    public float CalculateWorkedSalary() => HourlyRate * HoursInMonth;
+}
